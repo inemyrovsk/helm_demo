@@ -16,13 +16,20 @@ spec:
     spec:
       containers:
       - name: flask
-        image: demo:latest
+        image: inemyrovsk/helm-demo:v6
+        env:
+          - name: DEPLOY_ENV
+            value: "TEST"
+          - name: HOST
+            value: "0.0.0.0"
+          - name: PORT
+            value: "80"
         volumeMounts:
           - name: secret
             mountPath: "/mnt/"
             readOnly: true
         ports:
-        - containerPort: 8000
+        - containerPort: 80
       volumes:
         - name: secret
           configMap:

@@ -25,7 +25,7 @@ pip install -r ./app/requirements.txt
 
 #### 3.1 build docker image
 ```
-docker build -t demo
+docker build -t demo .
 ```
 #### 3.2 start docker container
 ```

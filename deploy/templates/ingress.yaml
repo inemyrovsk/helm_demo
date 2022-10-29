@@ -1,0 +1,26 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-helm-demo
+  annotations:
+    alb.ingress.kubernetes.io/subnets: subnet-1c0b4b75, subnet-83d758f8
+    alb.ingress.kubernetes.io/security-groups: sg-0fd66b7b6edfb4e52
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:424386943850:certificate/1d4fa47e-cf10-405e-8ad2-e4dc6de7073b
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80},{"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/load-balancer-attributes: routing.http2.enabled=true
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/load-balancer-name: helm-demo-test
+    alb.ingress.kubernetes.io/group.name: helm-demo-test-group
+spec:
+  rules:
+    - host: demo-test.swag.com
+      http:
+        paths:
+          - pathType: ImplementationSpecific
+            backend:
+              service:
+                name: helm-demo-app
+                port:
+                  number: 80
