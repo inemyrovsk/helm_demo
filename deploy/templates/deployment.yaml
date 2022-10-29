@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helm-demo-app
+  labels:
+    app: helm-demo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: helm-demo-app
+  template:
+    metadata:
+      labels:
+        app: helm-demo-app
+    spec:
+      containers:
+      - name: flask
+        image: demo:latest
+        volumeMounts:
+          - name: secret
+            mountPath: "/mnt/"
+            readOnly: true
+        ports:
+        - containerPort: 8000
+      volumes:
+        - name: secret
+          configMap:
+            name: secret
