@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
       - name: flask
-        image: inemyrovsk/helm-demo:v6
+        image: inemyrovsk/helm-demo:v10
+        imagePullPolicy: IfNotPresent
         env:
           - name: DEPLOY_ENV
             value: "TEST"

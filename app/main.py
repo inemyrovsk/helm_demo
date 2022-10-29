@@ -5,10 +5,10 @@ from flask import Flask, render_template
 ENVIRONMENT = "TEST"
 # ENVIRONMENT = os.getenv('DEPLOY_ENV')
 # HOST = "0.0.0.0"
-# HOST = os.getenv('HOST')
+HOST = os.getenv('HOST')
 # PORT = 8000
 PORT_STR = os.getenv('PORT')
-# PORT = int(PORT_STR)
+PORT = int(PORT_STR)
 
 app = Flask(ENVIRONMENT)
 
@@ -32,4 +32,4 @@ def hello():
 
 
 if __name__ == "__main__":
-    app.run(port=80)
+    app.run(host=HOST, port=PORT)

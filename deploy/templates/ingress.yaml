@@ -11,16 +11,17 @@ metadata:
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80},{"HTTPS": 443}]'
     alb.ingress.kubernetes.io/load-balancer-attributes: routing.http2.enabled=true
     kubernetes.io/ingress.class: alb
-    alb.ingress.kubernetes.io/load-balancer-name: helm-demo-test
-    alb.ingress.kubernetes.io/group.name: helm-demo-test-group
+    alb.ingress.kubernetes.io/load-balancer-name: helm-demo-test-1
+    alb.ingress.kubernetes.io/group.name: helm-demo-test-group-1
 spec:
   rules:
-    - host: demo-test.swag.com
-      http:
-        paths:
-          - pathType: ImplementationSpecific
-            backend:
-              service:
-                name: helm-demo-app
-                port:
-                  number: 80
+  - host: demo-test.swag.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: helm-demo-app
+            port:
+              number: 80
