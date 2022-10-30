@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: flask
-        image: inemyrovsk/helm-demo:v10
+        image: inemyrovsk/helm-demo:v11
         imagePullPolicy: IfNotPresent
         env:
           - name: DEPLOY_ENV
@@ -24,14 +24,16 @@ spec:
           - name: HOST
             value: "0.0.0.0"
           - name: PORT
-            value: "80"
+            value: "5000"
         volumeMounts:
           - name: secret
             mountPath: "/mnt/"
             readOnly: true
         ports:
-        - containerPort: 80
+        - containerPort: 5000
       volumes:
         - name: secret
           configMap:
             name: secret
+      nodeSelector:
+        environment: test
