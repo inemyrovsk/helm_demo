@@ -1,43 +1,44 @@
-# helm_demo3
+## Deploy csi secrets in a new cluster
 
-#### variables:
-```
-HOST=0.0.0.0
-PORT=8000
-DEPLOY_ENV=test
-```
-### contribute:
-#### 1. setup virtual environment for python
+### source documentation: https://github.com/aws/secrets-store-csi-driver-provider-aws
 
+#### 1. Install Secrets Store CSI driver:
 
 ```
-pip install virtualenv && \
-python3 -m venv demo && \
-source demo/bin/activate
+helm repo add secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
+helm install -n kube-system csi-secrets-store secrets-store-csi-driver/secrets-store-csi-driver
 ```
 
-#### 2. install dependencies
+#### 2. Install AWS Provider for CSI
+
 ```
-pip install -r ./app/requirements.txt
+helm repo add aws-secrets-manager https://aws.github.io/secrets-store-csi-driver-provider-aws
+helm install -n kube-system secrets-provider-aws aws-secrets-manager/secrets-store-csi-driver-provider-aws
 ```
 
-### 3 spin up application locally
+#### 2. create policy 
 
-#### 3.1 build docker image
 ```
-docker build -t demo .
-```
-#### 3.2 start docker container
-```
-docker run -p 8000:8000 -d --name demo_app demo
+POLICY_ARN=$(aws --region us-east-2 --query Policy.Arn --output text iam create-policy --policy-name get-secrets-policy --policy-document '{
+    "Version": "2012-10-17",
+    "Statement": [ {
+        "Effect": "Allow",
+        "Action": ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
+        "Resource": ["arn:*:secretsmanager:*:*:secret:*"]
+    } ]
+}')
 ```
 
-## Stop project 
-### 1. stoip app
+#### 3. Create the IAM OIDC provider for the cluster if you have not already done so:
+
 ```
-docker rm --force demo_app
+eksctl utils associate-iam-oidc-provider --region="$REGION" --cluster="$CLUSTERNAME" --approve # Only run this once
 ```
-### 2. deactivate virtual environment
+
+#### 4. create IAM Service Account 
+
 ```
-deactivate
+eksctl create iamserviceaccount --name getsecrets-$ENV --region="$REGION" --cluster "$CLUSTER_NAME" --namespace swag-$ENV --attach-policy-arn "arn:aws:iam::$ACCOUNT_NUMBER:policy/get-secrets-policy" --approve --override-existing-serviceaccounts
 ```
+
+#### 5. Deploy your app with mount from SecretProviderClass
