@@ -14,6 +14,7 @@ spec:
       labels:
         app: helm-demo-app
     spec:
+      serviceAccountName: getsecrets
       containers:
       - name: flask
         image: inemyrovsk/helm-demo:v11
@@ -26,14 +27,17 @@ spec:
           - name: PORT
             value: "5000"
         volumeMounts:
-          - name: secret
+          - name: secrets-store-inline
             mountPath: "/mnt/"
             readOnly: true
         ports:
         - containerPort: 5000
       volumes:
-        - name: secret
-          configMap:
-            name: secret
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: secrets-example
       nodeSelector:
         environment: test
