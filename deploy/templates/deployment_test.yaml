@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-app
+  labels:
+    app: demo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-app
+  template:
+    metadata:
+      labels:
+        app: demo-app
+    spec:
+      serviceAccountName: getsecrets
+      containers:
+      - name: flask
+        image: inemyrovsk/helm-demo:v11
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: DEPLOY_ENV
+            value: "TEST"
+          - name: HOST
+            value: "0.0.0.0"
+          - name: PORT
+            value: "5000"
+        volumeMounts:
+          - name: secrets-store-inline
+            mountPath: "/mnt/"
+            readOnly: true
+        ports:
+        - containerPort: 5000
+      volumes:
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: secrets-example
+      nodeSelector:
+        environment: test
